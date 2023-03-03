@@ -1,50 +1,38 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getContacts, addContact, deleteContact } from 'services/posts-api';
-import * as actions  from './contacts-action';
 
-export const fetchContacts = () => {
-  const contacts = async dispatch => {
+export const fetchContacts = createAsyncThunk(
+  'contacts/fetch',
+  async (_, thunkAPI) => {
     try {
-      dispatch(actions.fetchContactsLoading());
       const data = await getContacts();
-
-      dispatch(actions.fetchContactsSuccess(data))
-
-    } catch ({response}) {
-      dispatch(actions.fetchContactsError(response.data.message))
+      return data;
+    } catch ({ response }) {
+      return thunkAPI.rejectWithValue(response.data);
     }
-  };
-
-  return contacts;
-};
-
-export const fetchAddContact = (data) => {
-  const contacts = async dispatch => {
-    try {
-      dispatch(actions.fetchAddContactsLoading());
-      const result = await addContact(data);
-      dispatch(actions.fetchAddContactsSuccess(result))
-
-    } catch ({response}) {
-      dispatch(actions.fetchAddContactsError(response.data.message))
-    }
-  };
-
-  return contacts;
   }
+);
 
-  export const fetchDeleteContact = (id) => {
-    const contacts = async dispatch => {
-      try {
-        dispatch(actions.fetchDeleteContactsLoading());
-        await deleteContact(id);
-        dispatch(actions.fetchDeleteContactsSuccess(id))
-  
-      } catch ({response}) {
-        dispatch(actions.fetchDeleteContactsError(response.data.message))
-      }
-    };
-  
-    return contacts;
+export const fetchAddContact = createAsyncThunk(
+  'contacts/add',
+  async (data, thunkAPI) => {
+    try {
+      const result = await addContact(data);
+      return result;
+    } catch ({ response }) {
+      return thunkAPI.rejectWithValue(response.data);
     }
-  
+  }
+);
 
+export const fetchDeleteContact = createAsyncThunk(
+  'contacts/delete',
+  async (id, { rejectWithValue }) => {
+    try {
+      await deleteContact(id);
+      return id;
+    } catch ({ response }) {
+      return rejectWithValue(response.data);
+    }
+  }
+);

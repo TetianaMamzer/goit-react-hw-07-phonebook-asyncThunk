@@ -64,7 +64,7 @@ export default function PhoneBook() {
 
 
 
-
+console.log(contacts.length)
   return (
       <Conteiner title="Phonebook">
         <Form  onSubmit={onAddContact}/>
